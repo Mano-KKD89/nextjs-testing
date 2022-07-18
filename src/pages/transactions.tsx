@@ -9,6 +9,8 @@ import _ from 'lodash';
 import { AutoComplete, DatePicker } from 'antd';
 import "antd/dist/antd.css";
 
+// import getServerSideProps
+
 
 export default function testing(this: any, { data,
     uniqueAmount,
@@ -19,7 +21,7 @@ export default function testing(this: any, { data,
     optionsInst
 }) {
 
-    const [bankTxn, setBankTxn] = useState();
+    const [bankTxn, setBankTxn] = useState({id:'', value:''});
     const [bankOptions, setBankOptions] = useState(optionsInst);
     const [txnamount, setTxnAmount] = useState();
     const [selectedValue, setSelectedValue] = useState();
@@ -37,14 +39,25 @@ export default function testing(this: any, { data,
     }
 
 
-    const handleChangeBank = (e) => {
+    const handleChangeBank = async (e: any) => {
         console.log(e)
-        setBankTxn(e[0].value);
+        if(e && e.length > 0) {
+            await setBankTxn({id:e[0].value, value:e[0].value});
+        }
+        console.log(bankTxn, '-------------->bankTxn')
+        await getTransactionData();
     }
-    const handleChange = (e) => {
-        setSelectedValue(e[0].value);
+    const  getTransactionData = async () => {
+        let payload:any = {};
+          payload = await {
+            bankTxn:bankTxn.value
+          }
+        console.log(payload, '------>>>payload')
     }
 
+    const handleChange = (e: any) => {
+        setSelectedValue(e[0].value);
+    }
     return (
         <div>
             <h1> testing </h1>
@@ -55,7 +68,7 @@ export default function testing(this: any, { data,
                 <Select
                     className="dropdown "
                     placeholder="select 4 bank"
-                    value={bankTxn}
+                    // value={bankTxn}
                     // value={txndatas.filter((obj, i) => { txndatas.include(obj.nameofInstitution) })}
                     options={bankOptions}
                     onChange={handleChangeBank}
@@ -142,6 +155,7 @@ export default function testing(this: any, { data,
 
 
 
+
 export async function getServerSideProps() {
     // const { params, req, res } = context
 
@@ -177,16 +191,16 @@ export async function getServerSideProps() {
     let uniqueDescr = _.uniqBy(data, obj => obj.description);
     // console.log(uniqueDescr);
 
-    const optionsAmount = uniqueAmount.map((d, index) => ({
+    const optionsAmount = uniqueAmount.map((d:any) => ({
         "value": d.amount,
         "label": d.amount.toString()
     }))
-    const optionsInst = uniqueInst.map(d => ({
+    const optionsInst = uniqueInst.map((d:any) => ({
         "value": d.nameofInstitution,
         "label": d.nameofInstitution.toString()
     }))
-    console.log(optionsInst);
-    const optionsAcctNo = uniqueAcctNo.map(d => ({
+    // console.log(optionsInst);
+    const optionsAcctNo = uniqueAcctNo.map((d:any) => ({
         "value": d.accountNo,
         "label": d.accountNo.toString()
     }))

@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-key */
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import moment from 'moment';
 import Select from 'react-select';
 import axios from 'axios';
@@ -19,7 +19,8 @@ export default function testing(this: any, { data,
     optionsInst
 }) {
 
-    const [bankTxn, setBankTxn] = useState({ id: '', value: '' });
+    const [tableData, setTableData] = useState(data);
+    const [bankTxn, setBankTxn] = useState('');
     const [amtTxn, setAmountTxn] = useState({ id: '', value: '' });
     const [acctTxn, setAcctTxn] = useState({ id: '', value: '' });
     const [bankOptions, setBankOptions] = useState(optionsInst);
@@ -40,31 +41,49 @@ export default function testing(this: any, { data,
     }
 
     const handleChangeBank = async (e: any) => {
-        // console.log(e)
-        if (e && e.length > 0) {
-            await setBankTxn({ id: e[0].value, value: e[0].value });
-        }
-        await getTransactionsData();
+        console.log(e)
+        // if (e && e.length > 0) {
+        //     let obj = { id: e[0].value, value: e[0].value };
+        //     // await setBankTxn({ id: e[0].value, value: e[0].value });
+        //     // setBankTxn(prevMovies => ({ ...prevMovies, ...obj}));
+        //     useEffect(() => { setBankTxn(e[0].value) }, [bankTxn])
+        // }
+        let s;
+        // useEffect(() => {
+            setTimeout(() => {
+                setBankTxn(e);
+            }, 2000);
+        //   }, []);
+         getTransactionsData(e,'bank');
     }
     const handleChangeAmount = async (e: any) => {
         if (e && e.length > 0) {
             await setAmountTxn({ id: e[0].value, value: e[0].value });
         }
-        await getTransactionsData();
+        await getTransactionsData(e,'amount');
     }
     const handleChangeAcct = async (e: any) => {
         if (e && e.length > 0) {
             await setAcctTxn({ id: e[0].value, value: e[0].value });
         }
-        await getTransactionsData();
+        await getTransactionsData(e,'acct');
     }
-    const getTransactionsData = async () => {
-        let payload: any = {};
-        payload = await {
-            bankTxn: bankTxn.value,
-            amtTxn: amtTxn.value,
-            acctTxn: acctTxn.value,
-        }
+    const getTransactionsData = async (search:any, type:string) => {
+        // let payload: any = {};
+        // payload = await {
+        //     bankTxn: bankTxn,
+        //     amtTxn: amtTxn.value,
+        //     acctTxn: acctTxn.value,
+        // }
+        console.log('object :>> ', data);
+        if (search && search.value){
+        let dataSearch =await data.filter((d:any) => {
+          return d.nameofInstitution == search.value;
+        } )
+        await setTableData(dataSearch)
+        console.log('dataSearch :>> ', dataSearch);
+        console.log('tableData :>> ', tableData);
+    }
     }
 
     const handleChange = (e: any) => {
@@ -137,7 +156,7 @@ export default function testing(this: any, { data,
                 </thead>
                 <tbody>
                     {
-                        data.map((item, index) => {
+                        tableData.map((item, index) => {
                             return (
                                 <tr key={item.matterId}>
                                     <td><input className='star px-8' type="checkbox" /></td>
